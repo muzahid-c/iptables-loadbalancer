@@ -60,32 +60,37 @@ For ubunutu
 ### Step2 (Create nodes)
 
 *Node1*
-`docker build -t node1:v1 .`
-
-`docker run --net lbnet0 --ip 11.11.11.7 --name node1 node1:v1`
+```
+docker build -t node1:v1 .
+docker run --net lbnet0 --ip 11.11.11.7 --name node1 node1:v1
+```
 
 *Node2*
-`docker build -t node2:v1 .`
-
-`docker run --net lbnet0 --ip 11.11.11.8 --name node2 node2:v1`
+```
+docker build -t node2:v1 .
+docker run --net lbnet0 --ip 11.11.11.8 --name node2 node2:v1
+```
 
 *Node3*
 
-`docker build -t node3:v1 .`
-
-`docker run --net lbnet0 --ip 11.11.11.9 --name node3 node3:v1`
+```
+docker build -t node3:v1 .
+docker run --net lbnet0 --ip 11.11.11.9 --name node3 node3:v1
+```
 
 ### Step3 (Allow public traffic to node1 - For testing)
-DNAT
+Usnig DNAT
 `iptables -A PREROUTING -t nat -p tcp -d 192.168.88.205 --dport 12345 -j DNAT --to-destination 11.11.11.7:80`
 
-SNAT
+Using SNAT
 `iptables -A POSTROUTING -t nat -p tcp -d 11.11.11.7 --dport 80 -j SNAT --to-source 192.168.88.205 `
 
 But this will not work as by default FORWARDING in iptables is disabled (drop rule)
 
-`sudo iptables -t filter -A FORWARD -d 11.11.11.7 -j ACCEPT`
-`sudo iptables -t filter -A FORWARD -s 11.11.11.7 -j ACCEPT`
+```
+sudo iptables -t filter -A FORWARD -d 11.11.11.7 -j ACCEPT
+sudo iptables -t filter -A FORWARD -s 11.11.11.7 -j ACCEPT
+```
 
 ### Step4 (Load Balancing IPTables rule)
 Using Round Robin:
