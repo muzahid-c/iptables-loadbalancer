@@ -55,7 +55,7 @@ For ubunutu
 
 
 ### Step1 (Create Custom docker network)
-docker network create --subnet=11.11.11.0/24 lbnet0
+`docker network create --subnet=11.11.11.0/24 lbnet0`
 
 ### Step2 (Create nodes)
 
@@ -75,7 +75,35 @@ docker network create --subnet=11.11.11.0/24 lbnet0
 
 `docker run --net lbnet0 --ip 11.11.11.9 --name node3 node3:v1`
 
-### Step3 ()
+### Step3 (Allow public traffic to node1 - For testing)
+DNAT
+`iptables -A PREROUTING -t nat -p tcp -d 192.168.88.205 --dport 12345 -j DNAT --to-destination 11.11.11.7:80`
+
+SNAT
+`iptables -A POSTROUTING -t nat -p tcp -d 11.11.11.7 --dport 80 -j SNAT --to-source 192.168.88.205 `
+
+But this will not work as by default FORWARDING in iptables is disabled (drop rule)
+
+`sudo iptables -t filter -A FORWARD -d 11.11.11.7 -j ACCEPT`
+`sudo iptables -t filter -A FORWARD -s 11.11.11.7 -j ACCEPT`
+
+### Step4 (Load Balancing IPTables rule)
+Using Round Robin:
+
+```
+iptables -A PREROUTING -t nat -p tcp -d 192.168.88.205 --dport 12345 -m statistic --mode nth --every 3 --packet 0 -j DNAT --to-destination 11.11.11.7:80
+iptables -A PREROUTING -t nat -p tcp -d 192.168.88.205 --dport 12345 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 11.11.11.8:80
+iptables -A PREROUTING -t nat -p tcp -d 192.168.88.205 --dport 12345 -j DNAT --to-destination 11.11.11.9:80
+```
+
+```
+iptables -t filter -A FORWARD -d 11.11.11.7 -j ACCEPT
+iptables -t filter -A FORWARD -d 11.11.11.8 -j ACCEPT
+iptables -t filter -A FORWARD -d 11.11.11.9 -j ACCEPT
+iptables -t filter -A FORWARD -s 11.11.11.7 -j ACCEPT
+iptables -t filter -A FORWARD -s 11.11.11.8 -j ACCEPT
+iptables -t filter -A FORWARD -s 11.11.11.9 -j ACCEPT
+```
 
 ### Reference
 1. https://www.howtogeek.com/177621/the-beginners-guide-to-iptables-the-linux-firewall/
