@@ -49,7 +49,9 @@ Don't allow the connection, but send back an error. It is like *drop* but with r
 
 ## Save IPTables rules
 For ubunutu
-`sudo /sbin/iptables-save`
+```
+sudo /sbin/iptables-save
+```
 
 ## TCP Load Balancer using IPTables
 
@@ -80,10 +82,14 @@ docker run --net lbnet0 --ip 11.11.11.9 --name node3 node3:v1
 
 ### Step3 (Allow public traffic to node1 - For testing)
 Usnig DNAT
-`iptables -A PREROUTING -t nat -p tcp -d 192.168.88.205 --dport 12345 -j DNAT --to-destination 11.11.11.7:80`
+```
+iptables -A PREROUTING -t nat -p tcp -d 192.168.88.205 --dport 12345 -j DNAT --to-destination 11.11.11.7:80
+```
 
 Using SNAT
-`iptables -A POSTROUTING -t nat -p tcp -d 11.11.11.7 --dport 80 -j SNAT --to-source 192.168.88.205 `
+```
+iptables -A POSTROUTING -t nat -p tcp -d 11.11.11.7 --dport 80 -j SNAT --to-source 192.168.88.205
+```
 
 But this will not work as by default FORWARDING in iptables is disabled (drop rule)
 
