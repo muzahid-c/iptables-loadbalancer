@@ -1,3 +1,5 @@
 FROM nginx
+RUN apt update && apt -y upgrade
+RUN apt install tcpdump net-tools iputils-ping -y
 
 COPY index.html /usr/share/nginx/html/index.html
