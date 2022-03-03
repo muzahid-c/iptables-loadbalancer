@@ -20,7 +20,7 @@ This  table is consulted when a packet that creates a new connection is encounte
 ### 4. raw
 ### 5. security
 
-## IPTables Chain
+## IPTables Chain:
  There are five chain (policy):
 
 ### 1. INPUT
@@ -44,7 +44,7 @@ Below command shows the default behaviour of iptables. Since no table is specifi
 iptables -L | grep policy
 ```
 
-## IPTables Response
+## IPTables Response:
 There are three responses:
 
 ### 1. ACCEPT
@@ -55,6 +55,16 @@ Drop the connection, act like it never happened.
 
 ### 3. REJECT
 Don't allow the connection, but send back an error. It is like *drop* but with response.
+
+## IPTables Command Syntax
+IPTables follow below syntax:
+```
+iptables -t [table] - OPTIONS [CHAINS] [matching component] [action component]
+```
+Example: <br />
+`iptables -t filter -A FORWARD -d 11.11.11.1 -j REJECT`
+<br /> Meaning in filter table append (-A) in the forward chain by adding a rule. The rule is if destination is 11.11.11.1 then REJECT the packet. Here -j means Jump which is an action. Matching component is ignored here but can be used using -m.
+
 
 ## Save IPTables rule
 IPTables rules are volatile is not saved by below command (for ubuntu linux).
